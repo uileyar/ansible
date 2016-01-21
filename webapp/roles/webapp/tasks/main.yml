@@ -1,0 +1,24 @@
+---
+# This role installs goproxy and configures it.
+- name: mkdir folder
+  command: mkdir {{ project_name }}
+  ignore_errors: True
+
+- name: copy binary file
+  copy: src={{ project_name }}.tar.gz dest=./{{ project_name }}/
+          owner=root group=root mode=0775
+
+- name: get webapp pid
+  shell: "ps -A | grep {{project_name}} | grep -v grep | awk '{ print $1; }' "
+  register: pid_result
+
+- name: kill webapp
+  shell: "kill -9 {{pid_result.stdout}}"
+  when: pid_result.stdout != ""
+
+- name: tar binary file
+  shell: "cd {{ project_name }} && tar xzvf  {{ project_name }}.tar.gz"
+
+- name: run webapp
+  shell: "cd {{ project_name }} && nohup bash run.sh &"
+

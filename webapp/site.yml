@@ -1,0 +1,15 @@
+---
+# This playbook deploys the whole application stack in this site.  
+- hosts: local
+
+  tasks:
+  - name: package webapp
+    command: "$GOPATH/bin/revel package github.com/uileyar/{{project_name}}"
+    tags:
+        - repo1
+
+# Install packae to goproxy official servers
+- hosts: officialserver
+  sudo: yes
+  roles:
+  - webapp
